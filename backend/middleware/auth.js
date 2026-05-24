@@ -47,7 +47,10 @@ function requireAuth(req, res, next) {
   const token = parts[1];
 
   try {
-    const decoded = jwt.verify(token, config.auth.jwtSecret);
+    const decoded = jwt.verify(token, config.auth.jwtSecret, {
+      issuer: 'venueflow-api',
+      audience: 'venueflow-client',
+    });
     req.user = decoded;
     next();
   } catch (err) {

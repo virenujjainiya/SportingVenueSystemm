@@ -18,6 +18,23 @@ const CACHE_MAX_AGE_SECONDS = 5; // 5 second CDN cache for live data
 function performanceMiddleware(req, res, next) {
   const start = process.hrtime.bigint();
 
+  // Set cache headers immediately (before any middleware can interfere)
+  if (req.method === 'GET') {
+    const isCacheable = CACHEABLE_ROUTES.some((route) =>
+      req.path === route.replace('/api', '') || req.path.startsWith(route.replace('/api', '') + '/')
+    );
+    if (isCacheable && !req.path.includes('/auth')) {
+      res.set('Cache-Control', `public, max-age=${CACHE_MAX_AGE_SECONDS}, stale-while-revalidate=10`);
+      res.set('Vary', 'Accept-Encoding');
+    }
+  }
+
+  // Prevent caching of mutations and auth
+  if (req.method !== 'GET' || req.path.includes('/auth')) {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.set('Pragma', 'no-cache');
+  }
+
   // Intercept res.end to set timing header BEFORE the response is sent
   const originalEnd = res.end.bind(res);
   res.end = function (...args) {
@@ -28,20 +45,6 @@ function performanceMiddleware(req, res, next) {
     }
     return originalEnd(...args);
   };
-
-  // Set cache headers for cacheable GET routes
-  if (req.method === 'GET') {
-    const isCacheable = CACHEABLE_ROUTES.some((route) => req.path.startsWith(route.replace('/api', '')));
-    if (isCacheable) {
-      res.setHeader('Cache-Control', `public, max-age=${CACHE_MAX_AGE_SECONDS}, stale-while-revalidate=10`);
-      res.setHeader('Vary', 'Accept-Encoding, Accept');
-    }
-  }
-
-  // Prevent caching of POST/auth routes
-  if (req.method !== 'GET' || req.path.includes('/auth')) {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-  }
 
   next();
 }

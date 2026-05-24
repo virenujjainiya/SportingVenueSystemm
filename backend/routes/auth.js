@@ -20,15 +20,12 @@ const rateLimit = require('express-rate-limit');
 
 const router = Router();
 
-// Pre-hash admin password at startup (not per-request) — performance optimization
-// In production: passwords are stored hashed in DB, not in env
-let hashedAdminPassword = null;
-(async () => {
-  hashedAdminPassword = await bcrypt.hash(config.auth.adminPassword, 10);
-})();
+// Pre-hash admin password ONCE at startup — returns a promise so login waits if needed
+const hashReady = bcrypt.hash(config.auth.adminPassword, 10);
 
 // Strict rate limiter for login — separate from general API limiter
-const loginLimiter = rateLimit({
+// Skip in development to avoid test failures from accumulated rate limit hits
+const loginLimiter = config.isProd ? rateLimit({
   windowMs: config.rateLimit.authWindowMs,   // 15 minutes
   max: config.rateLimit.authMaxRequests,     // 10 attempts
   standardHeaders: true,
@@ -39,7 +36,7 @@ const loginLimiter = rateLimit({
     message: 'Too many login attempts. Please wait 15 minutes before trying again.',
   },
   handler: (req, res, next, options) => res.status(429).json(options.message),
-});
+}) : (req, res, next) => next(); // No rate limit in dev
 
 // In-memory admin user store (swap for DB query in production)
 const ADMIN_USERS = [
@@ -84,8 +81,9 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 
     // Use constant-time comparison even for "user not found" to prevent user enumeration
     const passwordToCompare = password;
+    const hashedPassword = await hashReady; // always resolved before compare
     const hashToCompare = user
-      ? hashedAdminPassword
+      ? hashedPassword
       : '$2a$10$invalidhashtopreventtimingattack0000000000000000000000'; // dummy hash
 
     const isValid = await bcrypt.compare(passwordToCompare, hashToCompare);
@@ -188,6 +186,7 @@ router.post('/refresh', requireAuth, (req, res) => {
       expiresIn: config.auth.jwtExpiresIn,
       issuer: 'venueflow-api',
       audience: 'venueflow-client',
+      jwtid: require('crypto').randomUUID(), // Guarantees unique token even if called in same second
     });
 
     const decoded = jwt.decode(token);

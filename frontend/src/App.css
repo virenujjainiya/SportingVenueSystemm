@@ -1,0 +1,31 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.app__content {
+  flex: 1;
+  margin-top: var(--header-height);
+  padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + var(--space-4));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Desktop layout — side nav instead of bottom */
+@media (min-width: 1024px) {
+  .app {
+    flex-direction: row;
+  }
+
+  .app__content {
+    margin-top: var(--header-height);
+    padding-bottom: var(--space-8);
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+  }
+}

@@ -1,0 +1,103 @@
+.live-feed {
+  padding: var(--space-2) var(--space-4);
+  animation: fadeInUp var(--duration-enter) var(--ease-out);
+}
+
+.live-feed__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.live-feed__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.live-feed__count {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.live-feed__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.live-feed__item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-left-width: 3px;
+  border-left-style: solid;
+}
+
+.live-feed__item.score-item {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), transparent);
+}
+
+.live-feed__item.critical-item {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), transparent);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.live-feed__item-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.live-feed__item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.live-feed__item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: 2px;
+}
+
+.live-feed__item-title {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+}
+
+.live-feed__item-time {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.live-feed__item-message {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-1);
+}
+
+.live-feed__empty {
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--text-tertiary);
+}
+
+.live-feed__empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-3);
+  animation: float 3s ease-in-out infinite;
+}

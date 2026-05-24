@@ -80,6 +80,8 @@
 .venue-map__queue-marker {
   cursor: pointer;
   transition: transform var(--duration-fast) var(--ease-spring);
+  transform-origin: center;
+  transform-box: fill-box;
 }
 
 .venue-map__queue-marker:hover {

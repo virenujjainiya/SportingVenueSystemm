@@ -33,9 +33,13 @@
   
   /* Accent Colors */
   --accent-primary:   #00d4ff;  /* Electric cyan — primary actions */
+  --accent-hover:     #00bfe6;  /* Slightly darker cyan — hover state */
   --accent-secondary: #7c3aed;  /* Purple — secondary elements */
   --accent-gradient:  linear-gradient(135deg, #00d4ff, #7c3aed);
   --accent-glow:      0 0 20px rgba(0, 212, 255, 0.3);
+  
+  /* Border */
+  --border-subtle:    rgba(255, 255, 255, 0.08);
   
   /* Semantic Colors */
   --color-success:    #10b981;  /* Green — low density, open */

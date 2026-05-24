@@ -1,19 +1,22 @@
 /*
  * AdminPanel Component
- * 
+ *
  * Admin dashboard accessible via the "More" tab.
+ * Shows login form if not authenticated, dashboard if logged in.
+ *
  * Features:
- * - Post announcements/alerts
- * - Update match score
+ * - JWT login / logout
+ * - Post announcements/alerts (auth protected)
+ * - Update match score via WebSocket
  * - View live stats (attendance, avg density, avg wait)
- * - Quick actions for queue management
  */
 
 import { useState } from 'react';
 import api from '../../utils/api';
+import LoginForm from '../LoginForm/LoginForm';
 import './AdminPanel.css';
 
-export default function AdminPanel({ venue, stats, matchClock, queues, emit, addToast }) {
+export default function AdminPanel({ venue, stats, matchClock, queues, emit, addToast, isAdmin, user, onLogin, onLogout }) {
   const [alertForm, setAlertForm] = useState({
     type: 'announcement',
     title: '',
@@ -23,24 +26,38 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
   const [sending, setSending] = useState(false);
 
   const score = matchClock?.score || {
-    home: { name: venue?.match?.homeTeam?.shortName || 'HOME', score: venue?.match?.homeTeam?.score || 0 },
-    away: { name: venue?.match?.awayTeam?.shortName || 'AWAY', score: venue?.match?.awayTeam?.score || 0 },
+    home: { name: venue?.match?.homeTeam?.shortName || 'HOME', score: venue?.match?.homeTeam?.score ?? 0 },
+    away: { name: venue?.match?.awayTeam?.shortName || 'AWAY', score: venue?.match?.awayTeam?.score ?? 0 },
   };
 
+  // ── Not logged in → Show login form ──────────────────────────
+  if (!isAdmin) {
+    return <LoginForm onLogin={onLogin} />;
+  }
+
+  // ── Post announcement ─────────────────────────────────────────
   const handlePostAlert = async (e) => {
     e.preventDefault();
     if (!alertForm.title || !alertForm.message) return;
     setSending(true);
+
     const res = await api.postFeed(alertForm);
+
     if (res.success) {
       setAlertForm({ type: 'announcement', title: '', message: '', severity: 'info' });
       addToast?.({ title: 'Sent!', message: 'Announcement posted successfully', severity: 'success' });
+    } else if (res.code === 'TOKEN_EXPIRED' || res.status === 401) {
+      addToast?.({ title: 'Session expired', message: 'Please sign in again.', severity: 'warning' });
+      onLogout?.();
+    } else if (res.errors?.length > 0) {
+      addToast?.({ title: 'Validation error', message: res.errors.join(', '), severity: 'warning' });
     } else {
       addToast?.({ title: 'Error', message: res.error || 'Failed to post announcement', severity: 'error' });
     }
     setSending(false);
   };
 
+  // ── Score control ─────────────────────────────────────────────
   const handleScoreUpdate = (team, delta) => {
     const newScore = {
       home: score.home.score,
@@ -49,11 +66,25 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
     if (team === 'home') newScore.home = Math.max(0, newScore.home + delta);
     if (team === 'away') newScore.away = Math.max(0, newScore.away + delta);
     emit('admin:updateScore', newScore);
+    addToast?.({ title: 'Score updated', message: `${newScore.home} – ${newScore.away}`, severity: 'info' });
   };
 
   return (
     <div className="admin-panel" id="admin-panel">
-      <h2 className="admin-panel__title">⚙️ Admin Dashboard</h2>
+      {/* Admin header with logout */}
+      <div className="admin-panel__header">
+        <h2 className="admin-panel__title">⚙️ Admin Dashboard</h2>
+        <div className="admin-panel__user">
+          <span className="admin-panel__user-name">👤 {user?.displayName || user?.username || 'Admin'}</span>
+          <button
+            className="admin-panel__logout-btn tap-target"
+            onClick={onLogout}
+            id="admin-logout-btn"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
 
       {/* Stats Overview */}
       <div className="admin-panel__stats">
@@ -86,18 +117,18 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
           <div className="admin-panel__score-team">
             <span>{score.home.name}</span>
             <div className="admin-panel__score-btns">
-              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('home', -1)}>−</button>
+              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('home', -1)} id="home-score-minus">−</button>
               <span className="admin-panel__score-num">{score.home.score}</span>
-              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('home', 1)}>+</button>
+              <button className="admin-panel__btn admin-panel__btn--plus tap-target" onClick={() => handleScoreUpdate('home', 1)} id="home-score-plus">+</button>
             </div>
           </div>
           <span className="admin-panel__score-vs">vs</span>
           <div className="admin-panel__score-team">
             <span>{score.away.name}</span>
             <div className="admin-panel__score-btns">
-              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('away', -1)}>−</button>
+              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('away', -1)} id="away-score-minus">−</button>
               <span className="admin-panel__score-num">{score.away.score}</span>
-              <button className="admin-panel__btn tap-target" onClick={() => handleScoreUpdate('away', 1)}>+</button>
+              <button className="admin-panel__btn admin-panel__btn--plus tap-target" onClick={() => handleScoreUpdate('away', 1)} id="away-score-plus">+</button>
             </div>
           </div>
         </div>
@@ -105,7 +136,7 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
 
       {/* Post Announcement */}
       <form className="admin-panel__section glass-card" onSubmit={handlePostAlert}>
-        <h3>Post Announcement</h3>
+        <h3>📡 Broadcast Message</h3>
         <div className="admin-panel__form-row">
           <select
             value={alertForm.type}
@@ -134,6 +165,7 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
           onChange={(e) => setAlertForm({ ...alertForm, title: e.target.value })}
           id="alert-title-input"
           required
+          maxLength={100}
         />
         <textarea
           placeholder="Message..."
@@ -142,9 +174,15 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
           onChange={(e) => setAlertForm({ ...alertForm, message: e.target.value })}
           id="alert-message-input"
           required
+          maxLength={500}
         />
-        <button type="submit" className="admin-panel__submit tap-target" disabled={sending} id="alert-submit-btn">
-          {sending ? 'Sending...' : '📡 Broadcast'}
+        <button
+          type="submit"
+          className="admin-panel__submit tap-target"
+          disabled={sending || !alertForm.title || !alertForm.message}
+          id="alert-submit-btn"
+        >
+          {sending ? '⏳ Sending...' : '📡 Broadcast'}
         </button>
       </form>
     </div>

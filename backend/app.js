@@ -53,9 +53,13 @@ app.use(compression({
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin || origin === config.corsOrigin) {
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = config.corsOrigin.split(',').map(o => o.trim());
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       return callback(null, true);
     }
+    
     callback(new Error(`CORS: origin "${origin}" not allowed`));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

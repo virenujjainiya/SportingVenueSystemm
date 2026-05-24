@@ -126,12 +126,30 @@ export function useVenueData() {
     return unsub;
   }, [on]);
 
-  // ── Match Clock Updates ────────────────────────────────────
+  // ── Match Clock Updates ────────────────────────────────────────────
   useEffect(() => {
     const unsub = on('venue:clock', (clockData) => {
       setMatchClock(clockData);
-      // Update venue status
-      setVenue((prev) => prev ? { ...prev, status: clockData.status } : prev);
+      // Update venue status AND scores so Header stays in sync
+      setVenue((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          status: clockData.status,
+          match: {
+            ...prev.match,
+            clock: clockData.clock,
+            half: clockData.half,
+            // Merge scores if provided by clock event
+            homeTeam: clockData.score?.home
+              ? { ...prev.match.homeTeam, score: clockData.score.home.score ?? prev.match.homeTeam.score }
+              : prev.match.homeTeam,
+            awayTeam: clockData.score?.away
+              ? { ...prev.match.awayTeam, score: clockData.score.away.score ?? prev.match.awayTeam.score }
+              : prev.match.awayTeam,
+          },
+        };
+      });
     });
     return unsub;
   }, [on]);

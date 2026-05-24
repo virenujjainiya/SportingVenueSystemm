@@ -1,21 +1,24 @@
 /*
  * Root Application Component
- * 
+ *
  * Layout:
- * - Fixed Header (score bar)
+ * - Fixed Header (score bar + connection status)
  * - Scrollable content area (switches between tabs)
  * - Fixed BottomNav
  * - Floating Toast notifications
  * - PWA install prompt
  * - Zone detail bottom sheet
- * 
- * State management: useVenueData hook (single source of truth)
+ *
+ * State management:
+ * - useVenueData hook — single source of truth for all venue data
+ * - useAuth hook — admin authentication state
  * Tab routing: simple state-based (no router needed for 4 views)
  */
 
 import { useState } from 'react';
 import { useVenueData } from './hooks/useVenueData';
 import { usePWA } from './hooks/usePWA';
+import { useAuth } from './hooks/useAuth';
 import { TABS } from './utils/constants';
 
 import Header from './components/Header/Header';
@@ -35,14 +38,20 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(TABS.MAP);
   const [selectedZone, setSelectedZone] = useState(null);
 
+  // ── Venue Data (real-time via Socket.IO + REST) ──────────────
   const {
     venue, zones, queues, feed, stats, matchClock,
     isConnected, isLoading, toasts,
     dismissToast, emit, addToast,
   } = useVenueData();
 
+  // ── Admin Auth ───────────────────────────────────────────────
+  const { isAdmin, user, authLoading, login, logout } = useAuth();
+
+  // ── PWA Install ───────────────────────────────────────────────
   const { canInstall, promptInstall } = usePWA();
 
+  // ── Render active tab content ─────────────────────────────────
   const renderContent = () => {
     if (isLoading) {
       return activeTab === TABS.MAP ? <SkeletonMap /> : <SkeletonCard count={5} />;
@@ -70,6 +79,10 @@ export default function App() {
             queues={queues}
             emit={emit}
             addToast={addToast}
+            isAdmin={isAdmin}
+            user={user}
+            onLogin={login}
+            onLogout={logout}
           />
         );
       default:

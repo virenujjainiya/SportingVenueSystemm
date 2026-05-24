@@ -118,7 +118,7 @@ router.post('/:id', requireAuth, (req, res, next) => {
       });
     }
 
-    const zone = store.updateZone(req.params.id, updates);
+    const zone = store.updateZone(req.params.id, updates, { persist: true });
     if (!zone) {
       return res.status(404).json({
         success: false,

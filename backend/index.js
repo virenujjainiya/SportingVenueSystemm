@@ -22,72 +22,80 @@ const app = require('./app');
 const { createSocketServer } = require('./socket');
 const simulation = require('./simulation/engine');
 const config = require('./config');
+const store = require('./data/store');
 
-// Create HTTP server
-const server = http.createServer(app);
+// ── Bootstrap ──────────────────────────────────────────────────────────────
+// Awaits DB initialization before accepting requests
+async function bootstrap() {
+  // 1. Initialize store (loads from Supabase, falls back to in-memory)
+  await store.init();
 
-// Attach Socket.IO
-const io = createSocketServer(server);
-app.set('io', io);
+  // 2. Create HTTP server
+  const server = http.createServer(app);
 
-// Start simulation engine
-simulation.start(io, config.simulation.intervalMs);
+  // 3. Attach Socket.IO
+  const io = createSocketServer(server);
+  app.set('io', io);
 
-// Start listening
-server.listen(config.port, () => {
-  console.log('');
-  console.log('╔══════════════════════════════════════════════════════╗');
-  console.log('║         🏟️  VenueFlow Backend Server                ║');
-  console.log('╠══════════════════════════════════════════════════════╣');
-  console.log(`║  Status:      RUNNING                               ║`);
-  console.log(`║  Port:        ${String(config.port).padEnd(39)}║`);
-  console.log(`║  Environment: ${String(config.nodeEnv).padEnd(39)}║`);
-  console.log(`║  CORS Origin: ${String(config.corsOrigin).padEnd(39)}║`);
-  console.log('╠══════════════════════════════════════════════════════╣');
-  console.log('║  Endpoints:                                         ║');
-  console.log('║    GET  /health              Health check            ║');
-  console.log('║    GET  /api/venue           Venue metadata          ║');
-  console.log('║    GET  /api/zones           Zone densities          ║');
-  console.log('║    GET  /api/queues          Queue wait times        ║');
-  console.log('║    GET  /api/queues/recommend Smart recommendations  ║');
-  console.log('║    GET  /api/feed            Live event feed         ║');
-  console.log('║    GET  /api/stats           Dashboard stats         ║');
-  console.log('║    POST /api/feed            Post announcement       ║');
-  console.log('║    POST /api/queues/:id      Update queue            ║');
-  console.log('║    POST /api/zones/:id       Update zone             ║');
-  console.log('╠══════════════════════════════════════════════════════╣');
-  console.log('║  WebSocket Events:                                   ║');
-  console.log('║    → zone:update, queue:update, feed:new            ║');
-  console.log('║    → alert:broadcast, venue:clock                   ║');
-  console.log('║    → init:state, stats:connections                  ║');
-  console.log('╚══════════════════════════════════════════════════════╝');
-  console.log('');
-  console.log('[SIMULATION] Engine running — live data flowing');
-});
+  // 4. Start simulation engine
+  simulation.start(io, config.simulation.intervalMs);
 
-// Graceful shutdown
-function gracefulShutdown(signal) {
-  console.log(`\n[SERVER] ${signal} received. Shutting down gracefully...`);
-  simulation.stop();
-  io.close(() => {
-    server.close(() => {
-      console.log('[SERVER] All connections closed. Goodbye!');
-      process.exit(0);
-    });
+  // 5. Start listening
+  server.listen(config.port, () => {
+    const dbStatus = store.isDBEnabled() ? '🗄️  Supabase' : '📦 In-Memory';
+    console.log('');
+    console.log('╔══════════════════════════════════════════════════════╗');
+    console.log('║         🏟️  VenueFlow Backend Server                ║');
+    console.log('╠══════════════════════════════════════════════════════╣');
+    console.log(`║  Status:      RUNNING                               ║`);
+    console.log(`║  Port:        ${String(config.port).padEnd(39)}║`);
+    console.log(`║  Environment: ${String(config.nodeEnv).padEnd(39)}║`);
+    console.log(`║  Database:    ${dbStatus.padEnd(39)}║`);
+    console.log(`║  CORS Origin: ${String(config.corsOrigin).padEnd(39)}║`);
+    console.log('╠══════════════════════════════════════════════════════╣');
+    console.log('║  Endpoints:                                         ║');
+    console.log('║    GET  /health              Health check            ║');
+    console.log('║    GET  /api/venue           Venue metadata          ║');
+    console.log('║    GET  /api/zones           Zone densities          ║');
+    console.log('║    GET  /api/queues          Queue wait times        ║');
+    console.log('║    GET  /api/queues/recommend Smart recommendations  ║');
+    console.log('║    GET  /api/feed            Live event feed         ║');
+    console.log('║    GET  /api/stats           Dashboard stats         ║');
+    console.log('║    POST /api/feed            Post announcement       ║');
+    console.log('║    POST /api/queues/:id      Update queue            ║');
+    console.log('║    POST /api/zones/:id       Update zone             ║');
+    console.log('╠══════════════════════════════════════════════════════╣');
+    console.log('║  WebSocket Events:                                   ║');
+    console.log('║    → zone:update, queue:update, feed:new            ║');
+    console.log('║    → alert:broadcast, venue:clock                   ║');
+    console.log('║    → init:state, stats:connections                  ║');
+    console.log('╚══════════════════════════════════════════════════════╝');
+    console.log('');
+    console.log('[SIMULATION] Engine running — live data flowing');
   });
-  // Force exit after 10s
-  setTimeout(() => {
-    console.log('[SERVER] Forcing exit after timeout');
-    process.exit(1);
-  }, 10000);
+
+  // Graceful shutdown
+  function gracefulShutdown(signal) {
+    console.log(`\n[SERVER] ${signal} received. Shutting down gracefully...`);
+    simulation.stop();
+    io.close(() => {
+      server.close(() => {
+        console.log('[SERVER] All connections closed. Goodbye!');
+        process.exit(0);
+      });
+    });
+    setTimeout(() => { process.exit(1); }, 10000);
+  }
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+  return server;
 }
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-process.on('unhandledRejection', (err) => {
-  console.error('[FATAL] Unhandled rejection:', err);
+// Run
+bootstrap().catch((err) => {
+  console.error('[FATAL] Bootstrap failed:', err);
+  process.exit(1);
 });
-process.on('uncaughtException', (err) => {
-  console.error('[FATAL] Uncaught exception:', err);
-  gracefulShutdown('uncaughtException');
-});
+

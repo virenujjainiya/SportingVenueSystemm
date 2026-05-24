@@ -181,7 +181,7 @@ router.post('/:id', requireAuth, (req, res, next) => {
       });
     }
 
-    const queue = store.updateQueue(req.params.id, updates);
+    const queue = store.updateQueue(req.params.id, updates, { persist: true });
     if (!queue) {
       return res.status(404).json({
         success: false,

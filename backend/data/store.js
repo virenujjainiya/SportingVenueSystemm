@@ -122,9 +122,18 @@ seedFeed.forEach((item, i) => {
 // STORE API — This interface stays the same when migrating to Redis
 // ============================================================
 const store = {
-  // Venue
-  getVenue: () => ({ ...venue }),
-  updateVenue: (updates) => Object.assign(venue, updates),
+  // Venue — deep copy to prevent reference leaks on nested match object
+  getVenue: () => JSON.parse(JSON.stringify(venue)),
+  updateVenue: (updates) => {
+    // Shallow merge top-level, but deep merge 'match' to prevent overwriting nested objects
+    if (updates.match) {
+      Object.assign(venue.match, updates.match);
+      if (updates.match.homeTeam) Object.assign(venue.match.homeTeam, updates.match.homeTeam);
+      if (updates.match.awayTeam) Object.assign(venue.match.awayTeam, updates.match.awayTeam);
+      delete updates.match;
+    }
+    Object.assign(venue, updates);
+  },
 
   // Zones
   getZone: (id) => zones.has(id) ? { ...zones.get(id) } : null,

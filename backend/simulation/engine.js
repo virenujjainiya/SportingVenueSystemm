@@ -96,10 +96,14 @@ function simulateQueues() {
 }
 
 function simulateMatchEvents() {
+  const venue = store._venue;
+
+  // Don't generate match events during halftime or after match ended
+  if (venue.status === 'halftime' || venue.status === 'ended') return;
+
   // 10% chance of a match event each cycle
   if (Math.random() > 0.10) return;
 
-  const venue = store._venue;
   const event = randomPick(scoreEvents);
   const isHome = Math.random() > 0.5;
   const team = isHome ? venue.match.homeTeam.name : venue.match.awayTeam.name;

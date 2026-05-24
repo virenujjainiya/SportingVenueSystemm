@@ -86,6 +86,7 @@
   font-weight: var(--weight-bold);
   color: var(--text-primary);
   transition: background var(--duration-fast) var(--ease-smooth);
+  flex-shrink: 0;
 }
 
 .admin-panel__btn:hover {

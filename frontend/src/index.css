@@ -190,6 +190,7 @@ button {
 img, svg {
   display: block;
   max-width: 100%;
+  flex-shrink: 0;
 }
 
 input, textarea, select {
@@ -477,10 +478,15 @@ h4 { font-size: var(--text-lg); }
   }
 }
 
+@media (min-width: 768px) {
+  :root {
+    --content-max-width: 800px;
+  }
+}
+
 @media (min-width: 1024px) {
   :root {
     --content-max-width: 1200px;
-    --bottom-nav-height: 0px; /* No bottom nav on desktop */
   }
 }
 

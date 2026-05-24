@@ -14,10 +14,11 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Desktop layout — side nav instead of bottom */
-@media (min-width: 1024px) {
+/* Tablet and Desktop layout — side nav instead of bottom */
+@media (min-width: 768px) {
   .app {
     flex-direction: row;
+    padding-left: 80px;
   }
 
   .app__content {

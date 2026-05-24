@@ -73,3 +73,9 @@
   background: var(--bg-hover);
   color: var(--text-primary);
 }
+
+@media (min-width: 768px) {
+  .toast-container {
+    left: calc(80px + var(--space-4));
+  }
+}

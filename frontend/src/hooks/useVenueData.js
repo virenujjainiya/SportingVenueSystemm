@@ -75,6 +75,7 @@ export function useVenueData() {
         setError(null);
       } catch (err) {
         setError('Failed to load venue data. Please check your connection.');
+        addToast({ title: 'Connection Error', message: 'Failed to load venue data.', severity: 'error' });
         console.error('[VenueData] Initial fetch error:', err);
       } finally {
         setIsLoading(false);
@@ -82,7 +83,7 @@ export function useVenueData() {
     }
 
     fetchInitialData();
-  }, []);
+  }, [addToast]);
 
   // ── Socket.IO Initial State ────────────────────────────────
   useEffect(() => {
@@ -153,6 +154,17 @@ export function useVenueData() {
   const refresh = useCallback(() => {
     emit('request:refresh');
   }, [emit]);
+
+  // ── Connection Status Toasts ───────────────────────────────
+  const prevConnected = useRef(isConnected);
+  useEffect(() => {
+    if (isConnected && !prevConnected.current) {
+      addToast({ title: 'Connected', message: 'Live connection established.', severity: 'success' });
+    } else if (!isConnected && prevConnected.current) {
+      addToast({ title: 'Disconnected', message: 'Lost connection to venue. Reconnecting...', severity: 'warning' });
+    }
+    prevConnected.current = isConnected;
+  }, [isConnected, addToast]);
 
   return {
     // Data

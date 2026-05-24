@@ -34,7 +34,9 @@ export default function AdminPanel({ venue, stats, matchClock, queues, emit, add
     const res = await api.postFeed(alertForm);
     if (res.success) {
       setAlertForm({ type: 'announcement', title: '', message: '', severity: 'info' });
-      addToast?.({ title: 'Sent!', message: 'Announcement posted successfully', severity: 'info' });
+      addToast?.({ title: 'Sent!', message: 'Announcement posted successfully', severity: 'success' });
+    } else {
+      addToast?.({ title: 'Error', message: res.error || 'Failed to post announcement', severity: 'error' });
     }
     setSending(false);
   };

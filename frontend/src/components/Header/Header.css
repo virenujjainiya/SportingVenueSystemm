@@ -1,0 +1,143 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-header);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.header__inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Status / Connection */
+.header__status {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.header__connection {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.header__connection.connected {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+}
+
+.header__connection.disconnected {
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--text-tertiary);
+}
+
+.header__connection-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.header__connection.connected .header__connection-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Score */
+.header__score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.header__team {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.header__team--home {
+  justify-content: flex-end;
+}
+
+.header__team--away {
+  justify-content: flex-start;
+}
+
+.header__team-logo {
+  font-size: 1.5rem;
+}
+
+.header__team-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+}
+
+.header__team-score {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  min-width: 28px;
+  text-align: center;
+}
+
+/* Clock */
+.header__clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.header__clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-secondary);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+}
+
+.header__clock--live {
+  color: var(--color-danger);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+.header__half {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-semibold);
+  margin-top: 2px;
+}
+
+/* Venue Name */
+.header__venue-name {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: center;
+  letter-spacing: 0.05em;
+}

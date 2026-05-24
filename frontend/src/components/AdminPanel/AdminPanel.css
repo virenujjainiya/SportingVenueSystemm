@@ -1,0 +1,153 @@
+.admin-panel {
+  padding: var(--space-2) var(--space-4);
+  animation: fadeInUp var(--duration-enter) var(--ease-out);
+}
+
+.admin-panel__title {
+  margin-bottom: var(--space-5);
+  font-size: var(--text-2xl);
+}
+
+/* Stats Grid */
+.admin-panel__stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.admin-panel__stat {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.admin-panel__stat-icon {
+  font-size: 1.5rem;
+}
+
+.admin-panel__stat-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--accent-primary);
+}
+
+.admin-panel__stat-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+/* Sections */
+.admin-panel__section {
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.admin-panel__section h3 {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-lg);
+}
+
+/* Score Control */
+.admin-panel__score-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.admin-panel__score-team {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-weight: var(--weight-semibold);
+}
+
+.admin-panel__score-btns {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-panel__btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+  transition: background var(--duration-fast) var(--ease-smooth);
+}
+
+.admin-panel__btn:hover {
+  background: var(--bg-hover);
+}
+
+.admin-panel__score-num {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  min-width: 32px;
+  text-align: center;
+}
+
+.admin-panel__score-vs {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+/* Form */
+.admin-panel__form-row {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.admin-panel__form-row select {
+  flex: 1;
+}
+
+.admin-panel__section input,
+.admin-panel__section textarea {
+  width: 100%;
+  margin-bottom: var(--space-3);
+}
+
+.admin-panel__section textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.admin-panel__submit {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--accent-gradient);
+  color: white;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  transition: transform var(--duration-fast) var(--ease-spring),
+              opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.admin-panel__submit:hover {
+  transform: scale(1.01);
+}
+
+.admin-panel__submit:active {
+  transform: scale(0.98);
+}
+
+.admin-panel__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

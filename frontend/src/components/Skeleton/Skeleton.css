@@ -1,0 +1,38 @@
+.skeleton-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.skeleton-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  animation: fadeInUp var(--duration-enter) var(--ease-out) forwards;
+  opacity: 0;
+}
+
+.skeleton-card__content {
+  flex: 1;
+}
+
+.skeleton--badge {
+  width: 50px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-map {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.skeleton-map__legend {
+  display: flex;
+  gap: var(--space-4);
+}

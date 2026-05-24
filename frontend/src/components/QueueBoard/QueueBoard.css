@@ -1,0 +1,201 @@
+.queue-board {
+  padding: var(--space-2) var(--space-4);
+  animation: fadeInUp var(--duration-enter) var(--ease-out);
+}
+
+/* Recommendation Card */
+.queue-board__recommendation {
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(124, 58, 237, 0.08));
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  animation: fadeInScale var(--duration-slow) var(--ease-spring);
+}
+
+.queue-board__rec-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.queue-board__rec-icon {
+  font-size: 1.2rem;
+}
+
+.queue-board__rec-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.queue-board__rec-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.queue-board__rec-emoji {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.queue-board__rec-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-board__rec-name {
+  display: block;
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--text-base);
+}
+
+.queue-board__rec-message {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.queue-board__rec-wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.queue-board__rec-wait-num {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-success);
+  line-height: 1;
+}
+
+.queue-board__rec-wait-unit {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+/* Filter Tabs */
+.queue-board__filters {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-3);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.queue-board__filters::-webkit-scrollbar {
+  display: none;
+}
+
+.queue-board__filter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.queue-board__filter.active {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--accent-primary);
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+/* Queue Cards */
+.queue-board__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.queue-board__card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.queue-board__card.closed {
+  opacity: 0.4;
+}
+
+.queue-board__card-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.queue-board__card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-board__card-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-board__card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.queue-board__card-trend {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.queue-board__card-wait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 50px;
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.queue-board__card-wait.changed {
+  animation: fadeInScale var(--duration-normal) var(--ease-spring);
+}
+
+.queue-board__card-wait-num {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+.queue-board__card-wait-unit {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
